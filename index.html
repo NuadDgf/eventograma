@@ -32,6 +32,10 @@
             width: 100%;
         }
 
+        /* =========================================================
+           CONTROLES DO MÊS
+           ========================================================= */
+
         .controles {
             display: flex;
             align-items: center;
@@ -66,6 +70,10 @@
             text-align: center;
             margin: 0;
         }
+
+        /* =========================================================
+           CALENDÁRIO
+           ========================================================= */
 
         #eventograma {
             width: 100%;
@@ -139,6 +147,10 @@
             margin-bottom: 4px;
         }
 
+        /* =========================================================
+           DIA ATUAL
+           ========================================================= */
+
         .dia.hoje {
             background-color: var(--cor-hoje-fundo);
             border: 2px solid var(--cor-hoje-borda);
@@ -147,6 +159,10 @@
         .dia.hoje .numero-dia {
             color: var(--cor-hoje-borda);
         }
+
+        /* =========================================================
+           EVENTOS
+           ========================================================= */
 
         .tag-evento {
             background-color: var(--cor-evento);
@@ -159,6 +175,10 @@
             word-wrap: break-word;
             line-height: 1.2;
         }
+
+        /* =========================================================
+           BOTÃO VOLTAR PARA O MÊS ATUAL
+           ========================================================= */
 
         .btn-hoje {
             margin-top: 15px;
@@ -177,7 +197,7 @@
         }
 
         /* =========================================================
-           MODAL COM O DESCRITIVO DO DIA
+           MODAL DOS DETALHES DO DIA
            ========================================================= */
 
         .modal-dia {
@@ -232,6 +252,7 @@
 
         .modal-evento strong {
             color: var(--cor-titulo);
+            display: block;
         }
 
         .modal-evento p {
@@ -240,36 +261,103 @@
             color: var(--cor-texto);
         }
 
+        .modal-periodo {
+            font-size: 13px;
+            color: #7f8c8d !important;
+        }
+
         .modal-sem-evento {
             color: #7f8c8d;
+        }
+
+        /* =========================================================
+           RESPONSIVIDADE
+           ========================================================= */
+
+        @media (max-width: 650px) {
+
+            .dia {
+                height: 75px;
+                padding: 4px;
+            }
+
+            .tag-evento {
+                font-size: 0.62em;
+            }
+
+            #mes-titulo {
+                font-size: 19px;
+                min-width: 160px;
+            }
+
+            .controles {
+                gap: 5px;
+            }
         }
     </style>
 </head>
 
 <body>
 
+    <!-- =========================================================
+         NAVEGAÇÃO ENTRE OS MESES
+         ========================================================= -->
+
     <div class="controles">
-        <button onclick="mudarMes(-1)">&#10094;</button>
-        <h2 id="mes-titulo">Mês Ano</h2>
-        <button onclick="mudarMes(1)">&#10095;</button>
+
+        <button
+            onclick="mudarMes(-1)"
+            title="Mês anterior"
+        >
+            &#10094;
+        </button>
+
+        <h2 id="mes-titulo">
+            Mês Ano
+        </h2>
+
+        <button
+            onclick="mudarMes(1)"
+            title="Próximo mês"
+        >
+            &#10095;
+        </button>
+
     </div>
+
+
+    <!-- =========================================================
+         CALENDÁRIO
+         ========================================================= -->
 
     <div id="eventograma"></div>
 
-    <button class="btn-hoje" onclick="irParaHoje()">
+
+    <button
+        class="btn-hoje"
+        onclick="irParaHoje()"
+    >
         Voltar para o Mês Atual
     </button>
 
 
     <!-- =========================================================
-         JANELA QUE APARECE AO CLICAR NO DIA
+         JANELA COM OS DETALHES DO DIA
          ========================================================= -->
 
-    <div id="modal-dia" class="modal-dia" onclick="fecharModal(event)">
+    <div
+        id="modal-dia"
+        class="modal-dia"
+        onclick="fecharModal(event)"
+    >
 
         <div class="modal-conteudo">
 
-            <button class="modal-fechar" onclick="fecharModal()">
+            <button
+                class="modal-fechar"
+                onclick="fecharModal()"
+                title="Fechar"
+            >
                 ×
             </button>
 
@@ -284,279 +372,140 @@
 
     <script>
 
-        // ====================================================================
-        // 1. ESCREVA SEUS EVENTOS AQUI ABAIXO
+        // ================================================================
+        // ================================================================
         //
-        // FORMATO:
+        //                 CADASTRO DOS EVENTOS
         //
-        // DATA - NOME DO EVENTO | DESCRIÇÃO
+        // ================================================================
         //
-        // A parte depois do "|" só será exibida quando clicar no dia.
-        // ====================================================================
+        //              EDITE SOMENTE ESTA ÁREA
+        //
+        // ================================================================
+        //
+        // Para adicionar um novo evento, copie um dos modelos abaixo.
+        //
+        //
+        // EVENTO DE UM ÚNICO DIA:
+        //
+        // {
+        //     dataInicio: "2026-08-27",
+        //     dataFim: "",
+        //     titulo: "Nome do evento",
+        //     descricao: "Descrição do evento."
+        // },
+        //
+        //
+        // EVENTO DE VÁRIOS DIAS:
+        //
+        // {
+        //     dataInicio: "2026-08-20",
+        //     dataFim: "2026-08-22",
+        //     titulo: "Nome do evento",
+        //     descricao: "Descrição do evento."
+        // },
+        //
+        //
+        // IMPORTANTE:
+        //
+        // As datas devem seguir o formato:
+        //
+        // AAAA-MM-DD
+        //
+        // Exemplo:
+        //
+        // 27 de agosto de 2026 = 2026-08-27
+        //
+        // ================================================================
+        // ================================================================
+
+
+        const eventos = [
+
+            {
+                dataInicio: "2026-08-27",
+                dataFim: "",
+                titulo: "Dia da Mopa",
+                descricao: "Descritivo completo sobre o Dia da Mopa."
+            },
+
+            {
+                dataInicio: "2026-08-20",
+                dataFim: "2026-08-22",
+                titulo: "Semana da Mopa",
+                descricao: "Durante esses dias serão realizadas atividades relacionadas à Semana da Mopa."
+            },
+
+            {
+                dataInicio: "2026-10-12",
+                dataFim: "2026-10-16",
+                titulo: "Semana Interna de Treinamento",
+                descricao: "Semana destinada às capacitações e treinamentos internos."
+            },
+
+            {
+                dataInicio: "2026-12-25",
+                dataFim: "",
+                titulo: "Natal",
+                descricao: "Feriado de Natal."
+            },
+
+            {
+                dataInicio: "2026-05-12",
+                dataFim: "",
+                titulo: "Aniversário de Juan",
+                descricao: "Aniversário de Juan."
+            }
+
+            /*
+            ================================================================
+            NOVO EVENTO
+
+            Para cadastrar outro evento, coloque uma vírgula depois do
+            evento anterior e copie este modelo:
+
+
+            ,
+
+            {
+                dataInicio: "2026-09-10",
+                dataFim: "",
+                titulo: "Nome do evento",
+                descricao: "Digite aqui o descritivo do evento."
+            }
+
+
+            Se for um período:
+
+
+            ,
+
+            {
+                dataInicio: "2026-09-10",
+                dataFim: "2026-09-12",
+                titulo: "Nome do evento",
+                descricao: "Digite aqui o descritivo do evento."
+            }
 
-        const listaDeTexto = `
+            ================================================================
+            */
 
-        27 de agosto de 2026 - Dia da Mopa | Descritivo completo sobre o Dia da Mopa.
+        ];
 
-        20 a 22 de agosto de 2026 - Semana da Mopa | Durante esses dias serão realizadas atividades relacionadas à Semana da Mopa.
 
-        12 a 16 de outubro - Semana Interna de Treinamento | Semana destinada às capacitações e treinamentos internos.
+        // ================================================================
+        // FIM DA ÁREA DE CADASTRO
+        // NÃO É NECESSÁRIO ALTERAR O CÓDIGO ABAIXO
+        // ================================================================
 
-        25/12 - Natal | Feriado de Natal.
 
-        12/05/2026 - aniversario de juan | Aniversário de Juan.
 
-        `;
+        const dataAtualReal =
+            new Date();
 
-        // ====================================================================
 
-
-        const dataAtualReal = new Date();
-
-        let dataVisualizacao = new Date();
-
-
-        // ====================================================================
-        // INTERPRETA OS EVENTOS
-        // ====================================================================
-
-        function interpretarEventos(texto) {
-
-            const eventosProcessados = [];
-
-            const linhas = texto.split('\n');
-
-            const anoPadrao = dataAtualReal.getFullYear();
-
-
-            const mesesMap = {
-
-                'janeiro': '01',
-                'fevereiro': '02',
-
-                'março': '03',
-                'marco': '03',
-
-                'abril': '04',
-                'maio': '05',
-                'junho': '06',
-                'julho': '07',
-                'agosto': '08',
-                'setembro': '09',
-                'outubro': '10',
-                'novembro': '11',
-                'dezembro': '12'
-            };
-
-
-            linhas.forEach(linha => {
-
-                linha = linha.trim();
-
-                if (!linha) return;
-
-
-                // ============================================================
-                // FORMATO:
-                // 27 de agosto de 2026 - Evento
-                // 20 a 22 de agosto de 2026 - Evento
-                // ============================================================
-
-                const regExt =
-                    /^(\d{1,2})(?:\s+a\s+(\d{1,2}))?\s+de\s+([a-zA-ZÀ-ÿ]+)(?:\s+de\s+(\d{4}))?\s*-\s*(.+)$/i;
-
-
-                const matchExt = linha.match(regExt);
-
-
-                if (matchExt) {
-
-                    let diaIn =
-                        matchExt[1].padStart(2, '0');
-
-
-                    let diaFim =
-                        matchExt[2]
-                            ? matchExt[2].padStart(2, '0')
-                            : null;
-
-
-                    let mesNum =
-                        mesesMap[
-                            matchExt[3].toLowerCase()
-                        ];
-
-
-                    let ano =
-                        matchExt[4] || anoPadrao;
-
-
-                    // ========================================================
-                    // SEPARA:
-                    //
-                    // Nome do evento | descrição
-                    // ========================================================
-
-                    let conteudo =
-                        matchExt[5].trim();
-
-
-                    let partes =
-                        conteudo.split('|');
-
-
-                    let nome =
-                        partes[0].trim();
-
-
-                    let descricao =
-                        partes.slice(1).join('|').trim();
-
-
-                    if (mesNum) {
-
-                        if (diaFim) {
-
-                            eventosProcessados.push({
-
-                                inicio:
-                                    `${ano}-${mesNum}-${diaIn}`,
-
-                                fim:
-                                    `${ano}-${mesNum}-${diaFim}`,
-
-                                nome,
-
-                                descricao
-                            });
-
-                        }
-
-                        else {
-
-                            eventosProcessados.push({
-
-                                data:
-                                    `${ano}-${mesNum}-${diaIn}`,
-
-                                nome,
-
-                                descricao
-                            });
-
-                        }
-
-                        return;
-                    }
-                }
-
-
-                // ============================================================
-                // FORMATO:
-                //
-                // 25/12 - Natal
-                // 12/05/2026 - Evento
-                // ============================================================
-
-                const regCurto =
-                    /^(\d{1,2}\/\d{1,2}(?:\/\d{4})?)(?:\s+a\s+(\d{1,2}\/\d{1,2}(?:\/\d{4})?))?\s*-\s*(.+)$/i;
-
-
-                const matchCurto =
-                    linha.match(regCurto);
-
-
-                if (matchCurto) {
-
-
-                    const converte = (dStr) => {
-
-                        let p =
-                            dStr.split('/');
-
-
-                        let dia =
-                            p[0].padStart(2, '0');
-
-
-                        let mes =
-                            p[1].padStart(2, '0');
-
-
-                        let ano =
-                            p[2] || anoPadrao;
-
-
-                        return `${ano}-${mes}-${dia}`;
-                    };
-
-
-                    let inicio =
-                        converte(matchCurto[1]);
-
-
-                    let diaFim =
-                        matchCurto[2];
-
-
-                    let conteudo =
-                        matchCurto[3].trim();
-
-
-                    let partes =
-                        conteudo.split('|');
-
-
-                    let nome =
-                        partes[0].trim();
-
-
-                    let descricao =
-                        partes.slice(1).join('|').trim();
-
-
-                    if (diaFim) {
-
-                        eventosProcessados.push({
-
-                            inicio: inicio,
-
-                            fim:
-                                converte(diaFim),
-
-                            nome,
-
-                            descricao
-                        });
-
-                    }
-
-                    else {
-
-                        eventosProcessados.push({
-
-                            data: inicio,
-
-                            nome,
-
-                            descricao
-                        });
-
-                    }
-
-                }
-
-            });
-
-
-            return eventosProcessados;
-        }
-
-
-
-        const eventos =
-            interpretarEventos(listaDeTexto);
-
+        let dataVisualizacao =
+            new Date();
 
 
         const mesesNomes = [
@@ -590,13 +539,68 @@
         ];
 
 
+        // ================================================================
+        // VERIFICA SE O EVENTO ESTÁ NA DATA
+        // ================================================================
 
-        // ====================================================================
+        function eventoOcorreNoDia(
+            evento,
+            dataBase
+        ) {
+
+            // Evento de apenas um dia
+
+            if (
+                !evento.dataFim
+            ) {
+
+                return (
+                    evento.dataInicio ===
+                    dataBase
+                );
+
+            }
+
+
+            // Evento com período
+
+            return (
+
+                dataBase >= evento.dataInicio
+
+                &&
+
+                dataBase <= evento.dataFim
+
+            );
+
+        }
+
+
+        // ================================================================
+        // BUSCA EVENTOS DO DIA
+        // ================================================================
+
+        function buscarEventos(
+            dataBase
+        ) {
+
+            return eventos.filter(
+                evento =>
+                    eventoOcorreNoDia(
+                        evento,
+                        dataBase
+                    )
+            );
+
+        }
+
+
+        // ================================================================
         // RENDERIZA O CALENDÁRIO
-        // ====================================================================
+        // ================================================================
 
         function renderizarMes() {
-
 
             const ano =
                 dataVisualizacao.getFullYear();
@@ -606,57 +610,69 @@
                 dataVisualizacao.getMonth();
 
 
-
-            document.getElementById('mes-titulo').innerText =
+            document.getElementById(
+                'mes-titulo'
+            ).innerText =
                 `${mesesNomes[mes]} ${ano}`;
 
 
-
             const container =
-                document.getElementById('eventograma');
+                document.getElementById(
+                    'eventograma'
+                );
 
 
-            container.innerHTML = '';
-
+            container.innerHTML =
+                '';
 
 
             const mesDiv =
-                document.createElement('div');
+                document.createElement(
+                    'div'
+                );
 
 
             mesDiv.className =
                 'mes';
 
 
-
             const grid =
-                document.createElement('div');
+                document.createElement(
+                    'div'
+                );
 
 
             grid.className =
                 'grid-dias';
 
 
+            // ============================================================
+            // CABEÇALHO DOS DIAS DA SEMANA
+            // ============================================================
 
-            diasSemana.forEach(d => {
+            diasSemana.forEach(
+                diaSemana => {
 
-
-                const header =
-                    document.createElement('div');
-
-
-                header.className =
-                    'dia-semana';
-
-
-                header.innerText =
-                    d;
+                    const header =
+                        document.createElement(
+                            'div'
+                        );
 
 
-                grid.appendChild(header);
+                    header.className =
+                        'dia-semana';
 
-            });
 
+                    header.innerText =
+                        diaSemana;
+
+
+                    grid.appendChild(
+                        header
+                    );
+
+                }
+            );
 
 
             const primeiroDia =
@@ -667,7 +683,6 @@
                 ).getDay();
 
 
-
             const diasNoMes =
                 new Date(
                     ano,
@@ -676,14 +691,13 @@
                 ).getDate();
 
 
+            let celulasDesenhadas =
+                0;
 
-            let celulasDesenhadas = 0;
 
-
-
-            // ================================================================
-            // ESPAÇOS ANTES DO PRIMEIRO DIA
-            // ================================================================
+            // ============================================================
+            // ESPAÇOS ANTES DO DIA 1
+            // ============================================================
 
             for (
                 let i = 0;
@@ -691,16 +705,19 @@
                 i++
             ) {
 
-
                 const vazio =
-                    document.createElement('div');
+                    document.createElement(
+                        'div'
+                    );
 
 
                 vazio.className =
                     'dia vazio';
 
 
-                grid.appendChild(vazio);
+                grid.appendChild(
+                    vazio
+                );
 
 
                 celulasDesenhadas++;
@@ -708,10 +725,9 @@
             }
 
 
-
-            // ================================================================
-            // DIAS
-            // ================================================================
+            // ============================================================
+            // CRIA OS DIAS
+            // ============================================================
 
             for (
                 let dia = 1;
@@ -719,37 +735,54 @@
                 dia++
             ) {
 
-
                 const dataStr =
 
                     `${ano}-` +
 
-                    `${String(mes + 1).padStart(2, '0')}-` +
+                    `${String(
+                        mes + 1
+                    ).padStart(
+                        2,
+                        '0'
+                    )}-` +
 
-                    `${String(dia).padStart(2, '0')}`;
-
+                    `${String(
+                        dia
+                    ).padStart(
+                        2,
+                        '0'
+                    )}`;
 
 
                 const diaDiv =
-                    document.createElement('div');
+                    document.createElement(
+                        'div'
+                    );
 
 
                 diaDiv.className =
                     'dia';
 
 
-
-                // ============================================================
-                // CLIQUE NO DIA
-                // ============================================================
+                // ========================================================
+                // CLICAR NO DIA
+                // ========================================================
 
                 diaDiv.onclick =
-                    () => abrirDetalhesDia(dataStr);
+                    () =>
+                        abrirDetalhesDia(
+                            dataStr
+                        );
 
 
+                // ========================================================
+                // NÚMERO DO DIA
+                // ========================================================
 
                 const numDiv =
-                    document.createElement('div');
+                    document.createElement(
+                        'div'
+                    );
 
 
                 numDiv.className =
@@ -760,13 +793,14 @@
                     dia;
 
 
-                diaDiv.appendChild(numDiv);
+                diaDiv.appendChild(
+                    numDiv
+                );
 
 
-
-                // ============================================================
+                // ========================================================
                 // DESTACA O DIA ATUAL
-                // ============================================================
+                // ========================================================
 
                 if (
 
@@ -785,27 +819,30 @@
 
                 ) {
 
-                    diaDiv.classList.add('hoje');
+                    diaDiv.classList.add(
+                        'hoje'
+                    );
 
                 }
 
 
-
-                // ============================================================
+                // ========================================================
                 // EVENTOS DO DIA
-                // ============================================================
+                // ========================================================
 
                 const eventosDoDia =
-                    buscarEventos(dataStr);
-
+                    buscarEventos(
+                        dataStr
+                    );
 
 
                 eventosDoDia.forEach(
-                    nomeEvento => {
-
+                    evento => {
 
                         const tagEvento =
-                            document.createElement('div');
+                            document.createElement(
+                                'div'
+                            );
 
 
                         tagEvento.className =
@@ -813,7 +850,7 @@
 
 
                         tagEvento.innerText =
-                            nomeEvento;
+                            evento.titulo;
 
 
                         diaDiv.appendChild(
@@ -822,7 +859,6 @@
 
                     }
                 );
-
 
 
                 grid.appendChild(
@@ -835,25 +871,27 @@
             }
 
 
-
-            // ================================================================
-            // COMPLETA O GRID
-            // ================================================================
+            // ============================================================
+            // COMPLETA A GRADE COM ESPAÇOS VAZIOS
+            // ============================================================
 
             while (
                 celulasDesenhadas < 42
             ) {
 
-
                 const vazio =
-                    document.createElement('div');
+                    document.createElement(
+                        'div'
+                    );
 
 
                 vazio.className =
                     'dia vazio';
 
 
-                grid.appendChild(vazio);
+                grid.appendChild(
+                    vazio
+                );
 
 
                 celulasDesenhadas++;
@@ -861,8 +899,9 @@
             }
 
 
-
-            mesDiv.appendChild(grid);
+            mesDiv.appendChild(
+                grid
+            );
 
 
             container.appendChild(
@@ -872,128 +911,26 @@
         }
 
 
+        // ================================================================
+        // ABRIR DETALHES DO DIA
+        // ================================================================
 
-        // ====================================================================
-        // BUSCA APENAS OS NOMES PARA MOSTRAR NO CALENDÁRIO
-        // ====================================================================
-
-        function buscarEventos(dataBase) {
-
-
-            let nomes = [];
-
-
-            eventos.forEach(ev => {
-
-
-                if (
-                    ev.data === dataBase
-                ) {
-
-                    nomes.push(
-                        ev.nome
-                    );
-
-                }
-
-
-                else if (
-                    ev.inicio &&
-                    ev.fim
-                ) {
-
-
-                    if (
-
-                        dataBase >= ev.inicio
-
-                        &&
-
-                        dataBase <= ev.fim
-
-                    ) {
-
-                        nomes.push(
-                            ev.nome
-                        );
-
-                    }
-
-                }
-
-            });
-
-
-            return nomes;
-
-        }
-
-
-
-        // ====================================================================
-        // BUSCA EVENTOS COMPLETOS
-        // NOME + DESCRIÇÃO
-        // ====================================================================
-
-        function buscarEventosCompletos(dataBase) {
-
-
-            return eventos.filter(ev => {
-
-
-                if (
-                    ev.data === dataBase
-                ) {
-
-                    return true;
-
-                }
-
-
-                if (
-                    ev.inicio &&
-                    ev.fim
-                ) {
-
-                    return (
-
-                        dataBase >= ev.inicio
-
-                        &&
-
-                        dataBase <= ev.fim
-
-                    );
-
-                }
-
-
-                return false;
-
-            });
-
-        }
-
-
-
-        // ====================================================================
-        // ABRE DESCRITIVO DO DIA
-        // ====================================================================
-
-        function abrirDetalhesDia(dataStr) {
-
+        function abrirDetalhesDia(
+            dataStr
+        ) {
 
             const [
                 ano,
                 mes,
                 dia
-            ] = dataStr.split('-');
-
+            ] =
+                dataStr.split(
+                    '-'
+                );
 
 
             const dataFormatada =
                 `${dia}/${mes}/${ano}`;
-
 
 
             document.getElementById(
@@ -1002,35 +939,34 @@
                 dataFormatada;
 
 
-
             const areaDescricao =
                 document.getElementById(
                     'modal-descricao'
                 );
 
 
-            areaDescricao.innerHTML = '';
-
+            areaDescricao.innerHTML =
+                '';
 
 
             const eventosDoDia =
-                buscarEventosCompletos(
+                buscarEventos(
                     dataStr
                 );
 
 
-
-            // ================================================================
+            // ============================================================
             // DIA SEM EVENTOS
-            // ================================================================
+            // ============================================================
 
             if (
                 eventosDoDia.length === 0
             ) {
 
-
                 const mensagem =
-                    document.createElement('div');
+                    document.createElement(
+                        'div'
+                    );
 
 
                 mensagem.className =
@@ -1048,67 +984,106 @@
             }
 
 
-            // ================================================================
+            // ============================================================
             // DIA COM EVENTOS
-            // ================================================================
+            // ============================================================
 
             else {
 
+                eventosDoDia.forEach(
+                    evento => {
 
-                eventosDoDia.forEach(ev => {
-
-
-                    const bloco =
-                        document.createElement('div');
-
-
-                    bloco.className =
-                        'modal-evento';
+                        const bloco =
+                            document.createElement(
+                                'div'
+                            );
 
 
-
-                    const titulo =
-                        document.createElement('strong');
-
-
-                    titulo.innerText =
-                        ev.nome;
+                        bloco.className =
+                            'modal-evento';
 
 
-                    bloco.appendChild(
-                        titulo
-                    );
+                        // ================================================
+                        // TÍTULO
+                        // ================================================
+
+                        const titulo =
+                            document.createElement(
+                                'strong'
+                            );
 
 
-
-                    if (
-                        ev.descricao
-                    ) {
-
-
-                        const descricao =
-                            document.createElement('p');
-
-
-                        descricao.innerText =
-                            ev.descricao;
+                        titulo.innerText =
+                            evento.titulo;
 
 
                         bloco.appendChild(
-                            descricao
+                            titulo
+                        );
+
+
+                        // ================================================
+                        // PERÍODO
+                        // ================================================
+
+                        if (
+                            evento.dataFim
+                        ) {
+
+                            const periodo =
+                                document.createElement(
+                                    'p'
+                                );
+
+
+                            periodo.className =
+                                'modal-periodo';
+
+
+                            periodo.innerText =
+                                `Período: ${formatarData(evento.dataInicio)} a ${formatarData(evento.dataFim)}`;
+
+
+                            bloco.appendChild(
+                                periodo
+                            );
+
+                        }
+
+
+                        // ================================================
+                        // DESCRIÇÃO
+                        // ================================================
+
+                        if (
+                            evento.descricao
+                        ) {
+
+                            const descricao =
+                                document.createElement(
+                                    'p'
+                                );
+
+
+                            descricao.innerText =
+                                evento.descricao;
+
+
+                            bloco.appendChild(
+                                descricao
+                            );
+
+                        }
+
+
+                        areaDescricao.appendChild(
+                            bloco
                         );
 
                     }
-
-
-                    areaDescricao.appendChild(
-                        bloco
-                    );
-
-                });
+                );
 
             }
-
 
 
             document.getElementById(
@@ -1119,13 +1094,45 @@
         }
 
 
+        // ================================================================
+        // FORMATAR DATA
+        // ================================================================
 
-        // ====================================================================
+        function formatarData(
+            data
+        ) {
+
+            if (
+                !data
+            ) {
+
+                return '';
+
+            }
+
+
+            const [
+                ano,
+                mes,
+                dia
+            ] =
+                data.split(
+                    '-'
+                );
+
+
+            return `${dia}/${mes}/${ano}`;
+
+        }
+
+
+        // ================================================================
         // FECHAR MODAL
-        // ====================================================================
+        // ================================================================
 
-        function fecharModal(event) {
-
+        function fecharModal(
+            event
+        ) {
 
             const modal =
                 document.getElementById(
@@ -1157,18 +1164,19 @@
         }
 
 
+        // ================================================================
+        // MÊS ANTERIOR / PRÓXIMO MÊS
+        // ================================================================
 
-        // ====================================================================
-        // ALTERAR MÊS
-        // ====================================================================
-
-        function mudarMes(direcao) {
-
+        function mudarMes(
+            direcao
+        ) {
 
             dataVisualizacao.setMonth(
 
                 dataVisualizacao.getMonth()
-                + direcao
+                +
+                direcao
 
             );
 
@@ -1178,13 +1186,11 @@
         }
 
 
-
-        // ====================================================================
+        // ================================================================
         // VOLTAR PARA O MÊS ATUAL
-        // ====================================================================
+        // ================================================================
 
         function irParaHoje() {
-
 
             dataVisualizacao =
                 new Date();
@@ -1195,18 +1201,17 @@
         }
 
 
-
-        // ====================================================================
-        // FECHAR COM ESC
-        // ====================================================================
+        // ================================================================
+        // FECHAR A JANELA COM ESC
+        // ================================================================
 
         document.addEventListener(
             'keydown',
             function(event) {
 
-
                 if (
-                    event.key === 'Escape'
+                    event.key ===
+                    'Escape'
                 ) {
 
                     document.getElementById(
@@ -1220,13 +1225,11 @@
         );
 
 
-
-        // ====================================================================
-        // INICIAR
-        // ====================================================================
+        // ================================================================
+        // INICIALIZAÇÃO
+        // ================================================================
 
         renderizarMes();
-
 
     </script>
 
