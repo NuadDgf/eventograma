@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eventograma</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        :root {
+            --cor-card: #ffffff;
+            --cor-texto: #333333;
+            --cor-titulo: #2c3e50;
+            --cor-evento: #3498db;
+            --cor-evento-texto: #ffffff;
+            --cor-hoje-borda: #e74c3c;
+            --cor-hoje-fundo: #fadbd8;
+        }
+
+        /* AJUSTE PRINCIPAL: O body agora é transparente e se ajusta ao conteúdo */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: transparent; /* Fundo transparente */
+            color: var(--cor-texto);
+            margin: 0;
+            padding: 10px; /* Padding reduzido */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            /* Removido o height: 100vh para não forçar tamanho de página inteira */
+        }
+
+        .controles {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            width: 100%;
+            max-width: 1000px;
+        }
+
+        .controles button {
+            background-color: transparent;
+            border: none;
+            font-size: 26px;
+            color: var(--cor-titulo);
+            cursor: pointer;
+            padding: 5px 15px;
+            border-radius: 8px;
+            transition: background-color 0.2s;
+        }
+
+        .controles button:hover {
+            background-color: #e2e6e9;
+        }
+
+        #mes-titulo {
+            font-size: 22px;
+            font-weight: bold;
+            color: var(--cor-titulo);
+            text-transform: capitalize;
+            min-width: 200px;
+            text-align: center;
+            margin: 0;
+        }
+
+        #eventograma {
+            width: 100%;
+            max-width: 1000px;
+        }
+
+        .mes {
+            background: var(--cor-card);
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08); /* Sombra suave para destacar no site principal */
+            width: 100%;
+        }
+
+        .grid-dias {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 6px;
+        }
+
+        .dia-semana {
+            font-weight: bold;
+            font-size: 0.9em;
+            color: #7f8c8d;
+            text-align: center;
+            margin-bottom: 5px;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #ecf0f1;
+        }
+
+        .dia {
+            border-radius: 6px;
+            background-color: #f9f9f9;
+            border: 1px solid #eaeaea;
+            height: 85px; 
+            display: flex;
+            flex-direction: column;
+            padding: 6px;
+            transition: background-color 0.2s;
+            overflow-y: auto;
+        }
+
+        .dia.vazio {
+            background-color: transparent; /* Deixa dias vazios invisíveis/limpos */
+            border: 1px solid transparent;
+            pointer-events: none;
+        }
+
+        .dia::-webkit-scrollbar { width: 4px; }
+        .dia::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
+
+        .dia:not(.vazio):hover {
+            background-color: #f1f2f6;
+        }
+
+        .numero-dia {
+            align-self: flex-end;
+            font-size: 0.9em;
+            font-weight: bold;
+            color: #7f8c8d;
+            margin-bottom: 4px;
+        }
+
+        .dia.hoje {
+            background-color: var(--cor-hoje-fundo);
+            border: 2px solid var(--cor-hoje-borda);
+        }
+
+        .dia.hoje .numero-dia {
+            color: var(--cor-hoje-borda);
+        }
+
+        .tag-evento {
+            background-color: var(--cor-evento);
+            color: var(--cor-evento-texto);
+            font-size: 0.7em;
+            font-weight: 500;
+            padding: 3px 6px;
+            border-radius: 4px;
+            margin-bottom: 3px;
+            word-wrap: break-word;
+            line-height: 1.2;
+        }
+
+        .btn-hoje {
+            margin-top: 15px;
+            background-color: var(--cor-titulo);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: background-color 0.2s;
+        }
+
+        .btn-hoje:hover {
+            background-color: #1a252f;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- O <h1> foi removido para deixar o componente mais limpo -->
+
+    <div class="controles">
+        <button onclick="mudarMes(-1)">&#10094;</button>
+        <h2 id="mes-titulo">Mês Ano</h2>
+        <button onclick="mudarMes(1)">&#10095;</button>
+    </div>
+
+    <div id="eventograma"></div>
+
+    <button class="btn-hoje" onclick="irParaHoje()">Voltar para o Mês Atual</button>
+
+    <script>
+        // ====================================================================
+        // 1. ESCREVA SEUS EVENTOS AQUI ABAIXO
+        // ====================================================================
+        const listaDeTexto = `
+        
+        27 de agosto de 2026 - Dia da Mopa
+        20 a 22 de agosto de 2026 - Semana da Mopa
+        12 a 16 de outubro - Semana Interna de Treinamento
+        25/12 - Natal
+        12/05/2026 - aniversario de juan
+
+        `;
+        // ====================================================================
+
+        const dataAtualReal = new Date();
+        let dataVisualizacao = new Date();
+
+        function interpretarEventos(texto) {
+            const eventosProcessados = [];
+            const linhas = texto.split('\n');
+            const anoPadrao = dataAtualReal.getFullYear();
+            
+            const mesesMap = {
+                'janeiro': '01', 'fevereiro': '02', 'março': '03', 'marco': '03',
+                'abril': '04', 'maio': '05', 'junho': '06', 'julho': '07',
+                'agosto': '08', 'setembro': '09', 'outubro': '10', 'novembro': '11', 'dezembro': '12'
+            };
+
+            linhas.forEach(linha => {
+                linha = linha.trim();
+                if(!linha) return;
+
+                const regExt = /^(\d{1,2})(?:\s+a\s+(\d{1,2}))?\s+de\s+([a-zA-ZçÇ]+)(?:\s+de\s+(\d{4}))?\s*-\s*(.+)$/i;
+                const matchExt = linha.match(regExt);
+
+                if(matchExt) {
+                    let diaIn = matchExt[1].padStart(2, '0');
+                    let diaFim = matchExt[2] ? matchExt[2].padStart(2, '0') : null;
+                    let mesNum = mesesMap[matchExt[3].toLowerCase()];
+                    let ano = matchExt[4] || anoPadrao;
+                    let nome = matchExt[5].trim();
+
+                    if(mesNum) {
+                        if(diaFim) {
+                            eventosProcessados.push({ inicio: `${ano}-${mesNum}-${diaIn}`, fim: `${ano}-${mesNum}-${diaFim}`, nome });
+                        } else {
+                            eventosProcessados.push({ data: `${ano}-${mesNum}-${diaIn}`, nome });
+                        }
+                        return;
+                    }
+                }
+
+                const regCurto = /^(\d{2}\/\d{2}(?:\/\d{4})?)(?:\s+a\s+(\d{2}\/\d{2}(?:\/\d{4})?))?\s*-\s*(.+)$/i;
+                const matchCurto = linha.match(regCurto);
+
+                if(matchCurto) {
+                    const converte = (dStr) => {
+                        let p = dStr.split('/');
+                        return `${p[2] || anoPadrao}-${p[1]}-${p[0]}`;
+                    }
+                    let inicio = converte(matchCurto[1]);
+                    let diaFim = matchCurto[2];
+                    let nome = matchCurto[3].trim();
+
+                    if(diaFim) {
+                        eventosProcessados.push({ inicio: inicio, fim: converte(diaFim), nome });
+                    } else {
+                        eventosProcessados.push({ data: inicio, nome });
+                    }
+                }
+            });
+            return eventosProcessados;
+        }
+
+        const eventos = interpretarEventos(listaDeTexto);
+        const mesesNomes = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+        const diasSemana = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"]; 
+
+        function renderizarMes() {
+            const ano = dataVisualizacao.getFullYear();
+            const mes = dataVisualizacao.getMonth();
+
+            document.getElementById('mes-titulo').innerText = `${mesesNomes[mes]} ${ano}`;
+
+            const container = document.getElementById('eventograma');
+            container.innerHTML = '';
+
+            const mesDiv = document.createElement('div');
+            mesDiv.className = 'mes';
+
+            const grid = document.createElement('div');
+            grid.className = 'grid-dias';
+
+            diasSemana.forEach(d => {
+                const header = document.createElement('div');
+                header.className = 'dia-semana';
+                header.innerText = d;
+                grid.appendChild(header);
+            });
+
+            const primeiroDia = new Date(ano, mes, 1).getDay();
+            const diasNoMes = new Date(ano, mes + 1, 0).getDate();
+            
+            let celulasDesenhadas = 0;
+
+            for (let i = 0; i < primeiroDia; i++) {
+                const vazio = document.createElement('div');
+                vazio.className = 'dia vazio';
+                grid.appendChild(vazio);
+                celulasDesenhadas++;
+            }
+
+            for (let dia = 1; dia <= diasNoMes; dia++) {
+                const dataStr = `${ano}-${String(mes + 1).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
+                
+                const diaDiv = document.createElement('div');
+                diaDiv.className = 'dia';
+                
+                const numDiv = document.createElement('div');
+                numDiv.className = 'numero-dia';
+                numDiv.innerText = dia;
+                diaDiv.appendChild(numDiv);
+
+                if (ano === dataAtualReal.getFullYear() && mes === dataAtualReal.getMonth() && dia === dataAtualReal.getDate()) {
+                    diaDiv.classList.add('hoje');
+                }
+
+                const eventosDoDia = buscarEventos(dataStr);
+                eventosDoDia.forEach(nomeEvento => {
+                    const tagEvento = document.createElement('div');
+                    tagEvento.className = 'tag-evento';
+                    tagEvento.innerText = nomeEvento;
+                    diaDiv.appendChild(tagEvento);
+                });
+
+                grid.appendChild(diaDiv);
+                celulasDesenhadas++;
+            }
+
+            while (celulasDesenhadas < 42) {
+                const vazio = document.createElement('div');
+                vazio.className = 'dia vazio';
+                grid.appendChild(vazio);
+                celulasDesenhadas++;
+            }
+
+            mesDiv.appendChild(grid);
+            container.appendChild(mesDiv);
+        }
+
+        function buscarEventos(dataBase) {
+            let nomes = [];
+            eventos.forEach(ev => {
+                if (ev.data === dataBase) {
+                    nomes.push(ev.nome);
+                } else if (ev.inicio && ev.fim) {
+                    if (dataBase >= ev.inicio && dataBase <= ev.fim) {
+                        nomes.push(ev.nome);
+                    }
+                }
+            });
+            return nomes;
+        }
+
+        function mudarMes(direcao) {
+            dataVisualizacao.setMonth(dataVisualizacao.getMonth() + direcao);
+            renderizarMes();
+        }
+
+        function irParaHoje() {
+            dataVisualizacao = new Date();
+            renderizarMes();
+        }
+
+        renderizarMes();
+
+    </script>
+</body>
+</html>
