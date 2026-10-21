@@ -776,18 +776,43 @@
         let eventos = [];
 
         function carregarEventos() {
-            // ATENÇÃO: SUBSTITUA O TEXTO ABAIXO PELA SUA URL DO GOOGLE APPS SCRIPT
             const urlAppsScript = "https://script.google.com/macros/s/AKfycbxP3NZAjeK5r6YldChv6Z1VwpJGu-Ac6V-85HuTP9wNtK2O3vVDgFfGfTou7JI6xXcU/exec";
 
-            // Busca os dados da planilha
+            // Alerta 1: Vai garantir-nos que a página está realmente atualizada no telemóvel e a tentar ligar
+            alert("Aviso 1: Tentando conectar com a Planilha...");
+
             fetch(urlAppsScript)
-                .then(resposta => resposta.json())
-                .then(dados => {
-                    eventos = dados; // Atualiza os eventos com os dados da planilha
-                    renderizarVisualizacao(); // Atualiza o calendário na tela
+                .then(resposta => {
+                    if (!resposta.ok) throw new Error("Erro do servidor Google: " + resposta.status);
+                    return resposta.text(); // Lemos como texto para o caso de a Google enviar uma página de erro HTML
+                })
+                .then(texto => {
+                    try {
+                        let dados = JSON.parse(texto);
+                        
+                        // Correção da nomenclatura: a Planilha manda "data_comemorativa", o calendário usa "comemorativa"
+                        dados = dados.map(ev => {
+                            if (ev.categoria === "data_comemorativa") {
+                                ev.categoria = "comemorativa";
+                            }
+                            return ev;
+                        });
+
+                        eventos = dados;
+                        
+                        // Alerta 2: Vai confirmar se a leitura foi 100% bem sucedida
+                        alert("Aviso 2: Sucesso! Foram encontrados " + eventos.length + " evento(s).");
+                        
+                        renderizarVisualizacao(); // Atualiza o calendário na tela
+                    } catch (e) {
+                        // Alerta 3: Se o Apps Script não tiver permissão "Qualquer pessoa", isto vai disparar
+                        alert("Aviso 3: Falha na permissão ou leitura. A Google respondeu: " + texto.substring(0, 100));
+                        console.error("Erro no JSON:", e, texto);
+                    }
                 })
                 .catch(erro => {
-                    console.error("Erro ao carregar eventos:", erro);
+                    // Alerta 4: Se o link estiver incorreto ou a internet falhar a meio
+                    alert("Aviso 4: Falha na conexão de rede: " + erro.message);
                 });
         }
 
