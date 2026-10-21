@@ -769,52 +769,15 @@
 
     <script>
 
-
         // ================================================================
-        //                      CADASTRO DOS EVENTOS
-        // ================================================================
-        //
-        // CATEGORIAS DISPONÍVEIS:
-        //
-        // "reuniao"
-        // "evento"
-        // "comemorativa"
-        // "feriado"
-        //
-        //
-        // EVENTO DE UM DIA:
-        //
-        // {
-        //     dataInicio: "AAAA-MM-DD",
-        //     dataFim: "",
-        //     titulo: "Nome",
-        //     descricao: "Descrição",
-        //     categoria: "reuniao"
-        // },
-        //
-        //
-        // EVENTO COM VÁRIOS DIAS:
-        //
-        // {
-        //     dataInicio: "AAAA-MM-DD",
-        //     dataFim: "AAAA-MM-DD",
-        //     titulo: "Nome",
-        //     descricao: "Descrição",
-        //     categoria: "evento"
-        // },
-        //
-        // ================================================================
-
-
-      // ================================================================
         // CONEXÃO COM A BASE DE DADOS (GOOGLE SHEETS)
         // ================================================================
         
         let eventos = [];
 
         function carregarEventos() {
-            // SUBSTITUA O TEXTO ABAIXO PELO SEU URL DO GOOGLE APPS SCRIPT
-            const urlAppsScript = "https://script.google.com/macros/s/AKfycbzyGtgDy79Hr_HdbtHZ5SNBtaYd9ms6WO2zDA4AlPeLxAhF-RE3Oma886pLPbrxbyxA/exec";
+            // ATENÇÃO: SUBSTITUA O TEXTO ABAIXO PELA SUA URL DO GOOGLE APPS SCRIPT
+            const urlAppsScript = "COLE_AQUI_A_URL_DA_SUA_IMPLANTACAO_DO_APPS_SCRIPT";
 
             // Busca os dados da planilha
             fetch(urlAppsScript)
@@ -827,13 +790,6 @@
                     console.error("Erro ao carregar eventos:", erro);
                 });
         }
-
-        // Chama a função para carregar os dados
-        carregarEventos();
-
-        // ================================================================
-        // FIM DA ÁREA DE CADASTRO
-        // ================================================================
 
 
         const dataAtualReal =
@@ -2296,8 +2252,8 @@
         // INICIAR
         // ================================================================
 
-        renderizarVisualizacao();
-
+        renderizarVisualizacao(); // Renderiza a estrutura vazia primeiro
+        carregarEventos(); // Busca os dados do Google Sheets e atualiza
 
     </script>
 
